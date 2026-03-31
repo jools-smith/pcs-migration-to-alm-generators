@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime" version="2.0">
+              
+    <endpoint name="LicGen" 
+              service="{urn:keygenerator.webservice.external.flexnet.com}LicenseGeneratorService" 
+              port="{urn:keygenerator.webservice.external.flexnet.com}LicenseGeneratorServicePort"  
+              implementation="com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceImpl" 
+              url-pattern="/services/LicenseGeneratorService"/>
+              
+</endpoints>

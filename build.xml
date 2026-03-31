@@ -1,0 +1,120 @@
+<project name="ExtGenSvc" default="build" basedir=".">
+    <description>
+        Web Services build file
+    </description>
+
+    <property environment="env"/>
+
+    <property name="BASE" location="."/>
+    <property name="src" location="${BASE}/src"/>
+    <property name="build" location="${BASE}/build"/>
+    <property name="dist" location="${BASE}/dist"/>
+    <property name="webcontent" location="${BASE}/WebContent"/>
+    <property name="generated" location="${BASE}/generated"/>
+    <property name="generated-src" location="${BASE}/generated/src"/>
+    <property name="schema-loc" location="${BASE}/schema"/>
+    <property name="warfile" location="${BASE}/../inst-services.war"/>
+    <property name="zipped-sources" location="${BASE}/../inst-services.zip"/>
+
+    <path id="licservice.classpath">
+        <fileset dir="${BASE}/WebContent/WEB-INF/lib">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="init" depends="clean">
+        <tstamp/>
+        <mkdir dir="${build}"/>
+        <mkdir dir="${generated-src}"/>
+    </target>
+
+    <target name="wsdl2src" depends="init" description="generate source from wsdl">
+        <taskdef name="jaxws"
+                 classname="com.sun.tools.ws.ant.WsImport"
+                 classpathref="licservice.classpath"/>
+
+        <jaxws wsdl="${BASE}/schema/LicenseGeneratorService.wsdl"
+               sourcedestdir="${generated-src}"
+               keep="true"
+               binding="${BASE}/schema/common-types.xml"
+               xnocompile="true">
+            <depends file="${BASE}/schema/LicenseGeneratorService.wsdl"/>
+            <produces dir="${generated-src}/com/flexnet/external/webservice/keygenerator"/>
+            <xjcarg value="-Xcollection-setter-injector"/>
+        </jaxws>
+
+    </target>
+
+    <target name="compile"
+            depends="wsdl2src"
+            description="compile the source ">
+        <javac srcdir="${generated-src}"
+               destdir="${build}"
+               includeantruntime="false"
+               debug="true"
+               encoding="utf-8"/>
+        <javac srcdir="${src}"
+               destdir="${build}"
+               includeantruntime="false"
+               debug="true"
+               classpathref="licservice.classpath"
+               encoding="utf-8"/>
+    </target>
+
+    <target name="build"
+            depends="compile"
+            description="generate the distribution war">
+        <mkdir dir="${dist}/war"/>
+        <copy todir="${dist}/war/build/WEB-INF/">
+            <fileset dir="${webcontent}/WEB-INF/"/>
+        </copy>
+        <copy todir="${dist}/war/build/WEB-INF/classes/">
+            <fileset dir="${build}"/>
+        </copy>
+        <copy todir="${dist}/war/build/WEB-INF/wsdl/schema">
+            <fileset dir="${schema-loc}"/>
+        </copy>
+        <jar jarfile="${warfile}" basedir="${dist}/war/build/"/>
+        <!-- <delete dir="${dist}" />
+        <delete dir="${generated-src}" />
+        <delete dir="${generated}" />
+        <delete dir="${build}" /> -->
+
+        <zip destfile="${zipped-sources}" basedir="${BASE}"/>
+    </target>
+
+    <target name="deploy" depends="build">
+        <copy tofile="${env.TOMCAT_HOME}/webapps/licgen.war" file="${warfile}"/>
+        <echo message=""/>
+        <echo
+                message="Once the tomcat is running, the services can be connected from FNO using http://server:port/licgen/services/LicenseGeneratorService, where licgen is the context root."/>
+    </target>
+
+    <target name="clean" description="clean up">
+        <!--
+            <fail message="${warfile} is not writeable. Did you check this file out?">
+              <condition>
+                <not>
+                  <isfileselected file="${warfile}">
+                    <writable />
+                  </isfileselected>
+                </not>
+              </condition>
+            </fail>
+            <fail message="${zipped-sources} is not writeable. Did you check this file out?">
+              <condition>
+                <not>
+                  <isfileselected file="${zipped-sources}">
+                    <writable />
+                  </isfileselected>
+                </not>
+              </condition>
+            </fail> -->
+        <delete file="${warfile}"/>
+        <delete file="${zipped-sources}"/>
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+        <delete dir="${generated-src}"/>
+        <delete dir="${generated}"/>
+    </target>
+</project>
