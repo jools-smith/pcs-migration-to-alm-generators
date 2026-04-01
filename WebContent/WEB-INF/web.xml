@@ -5,8 +5,13 @@ Inc.//DTD Web Application 2.3//EN"
 
 <web-app>
     <listener>
+        <!--
         <listener-class>
             com.sun.xml.ws.transport.http.servlet.WSServletContextListener
+        </listener-class>
+        -->
+        <listener-class>
+            com.revenera.gcs.Application
         </listener-class>
     </listener>
 <!--    <listener>-->

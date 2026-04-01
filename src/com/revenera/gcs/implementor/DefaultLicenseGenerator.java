@@ -9,13 +9,12 @@ import com.revenera.gcs.utils.Utils;
 import java.time.Instant;
 import java.util.ArrayList;
 
-@GeneratorImplementor(technology = "DEF")
+@GeneratorImplementor(technology = "DEF", isDefault = true)
 public final class DefaultLicenseGenerator extends AbstractImplementor {
-  private final static Log logger = Log.create(DefaultLicenseGenerator.class);
 
   @Override
   public String technologyId() {
-    return ImplementorFactory.default_technology_id;
+    return "DEF";
   }
 
   @Override

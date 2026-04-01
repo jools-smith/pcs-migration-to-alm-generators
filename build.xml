@@ -13,8 +13,8 @@
     <property name="generated" location="${BASE}/generated"/>
     <property name="generated-src" location="${BASE}/generated/src"/>
     <property name="schema-loc" location="${BASE}/schema"/>
-    <property name="warfile" location="${BASE}/../inst-services.war"/>
-    <property name="zipped-sources" location="${BASE}/../inst-services.zip"/>
+    <property name="warfile" location="${BASE}/pcs-migration-to-alm.war"/>
+    <property name="zipped-sources" location="${BASE}/pcs-migration-to-alm.zip"/>
 
     <path id="licservice.classpath">
         <fileset dir="${BASE}/WebContent/WEB-INF/lib">

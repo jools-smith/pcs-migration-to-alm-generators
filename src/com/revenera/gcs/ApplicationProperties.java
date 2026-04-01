@@ -1,79 +1,65 @@
 package com.revenera.gcs;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-
 
 public class ApplicationProperties {
+  private final static Instant started = Instant.now();
 
-  public final Map<Object,Object> properties;
-  public final Map<Object,Object> os;
-  public final Map<Object,Object> java;
-  public final Map<Object,Object> environment;
-
-  public final String hostName = SystemUtils.getHostName();
-
-  public final String userName = SystemProperties.getUserName("unknown");
-
-  public static Map<Object, Object> getBuildProperties() {
-    final Properties props = new Properties();
-
-    try {
-      props.load(ApplicationProperties.class.getResourceAsStream("/revenera.properties"));
-
-      // no reliance on actual property names
-      return props.stringPropertyNames().stream()
-          .collect(Collectors.toMap(
-              name -> name,
-              props::getProperty, (e1, e2) -> e1,
-              TreeMap::new
-          ));
-    }
-    catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
+  public final Map<String,Object> sys;
+  public final Map<String,Object> env;
+  public final Map<String,Object> os;
+  public final Map<String,Object> java;
 
   ApplicationProperties() {
 
-    // no reliance on actual property names
-    this.properties = getBuildProperties();
-
-    final Runtime runtime = Runtime.getRuntime();
-    this.environment = new LinkedHashMap<Object, Object>() {
+    this.sys = new LinkedHashMap<String, Object>() {
       {
-        put("availableProcessors", runtime.availableProcessors());
-        put("freeMemory", runtime.freeMemory());
-        put("totalMemory", runtime.totalMemory());
-        put("maxMemory", runtime.maxMemory());
+        put("TIMESTAMP", Instant.now().toString());
+        put("UP_TIME", getUpTime().toString());
+        put("USER_NAME", SystemProperties.getUserName("unknown"));
+        put("HOST_NAME", SystemUtils.getHostName());
       }
     };
 
-    final Properties systemProps = System.getProperties();
-    this.os = systemProps.stringPropertyNames().stream()
-        .filter(p -> p.startsWith("os."))
-        .collect(Collectors.toMap(
-            name -> name.substring("os.".length()).replace(".", " "),
-            systemProps::getProperty, (e1, e2) -> e1,
-            TreeMap::new
-        ));
+    final Runtime runtime = Runtime.getRuntime();
+    this.env = new LinkedHashMap<String, Object>() {
+      {
+        put("PROCESSORS", runtime.availableProcessors());
+        put("FREE_MEMORY", runtime.freeMemory() / (1024 * 1024) + "MB");
+        put("TOTAL_MEMORY", runtime.totalMemory() / (1024 * 1024) + "MB");
+        put("MAX_MEMORY", runtime.maxMemory() / (1024 * 1024) + "MB");
+      }
+    };
 
-    this.java = systemProps.stringPropertyNames().stream()
-        .filter(p -> p.startsWith("java."))
-        .collect(Collectors.toMap(
-            name -> name.substring("java.".length()).replace(".", " "),
-            systemProps::getProperty, (e1, e2) -> e1,
-            TreeMap::new
-        ));
+    this.os = new LinkedHashMap<String, Object>() {
+      {
+        put("OS_NAME", SystemUtils.OS_NAME);
+        put("OS_VERSION", SystemUtils.OS_VERSION);
+        put("OS_ARCH", SystemUtils.OS_ARCH);
+      }
+    };
 
+    this.java = new LinkedHashMap<String, Object>() {
+      {
+        put("JAVA_VERSION", SystemUtils.JAVA_VERSION);
+        put("JAVA_VENDOR", SystemUtils.JAVA_VENDOR);
+        put("JAVA_CLASS_VERSION", SystemUtils.JAVA_CLASS_VERSION);
+        put("JAVA_VM_NAME", SystemUtils.JAVA_VM_NAME);
+        put("JAVA_VM_INFO", SystemUtils.JAVA_VM_INFO);
+      }
+    };
+  }
 
+  @JsonIgnore
+  public Duration getUpTime() {
+    return Duration.between(started, Instant.now());
   }
 
   public static ApplicationProperties create() {

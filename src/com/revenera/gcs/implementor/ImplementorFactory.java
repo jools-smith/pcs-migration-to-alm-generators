@@ -9,19 +9,23 @@ import java.util.Map;
 public class ImplementorFactory {
   private final static Log logger = Log.create(ImplementorFactory.class);
 
-  public final static String default_technology_id = "DEF";
-
   private final Map<String, LicenseGeneratorServiceInterface> implementors = new HashMap<>();
 
-  public void addImplementor(final AbstractImplementor imp) {
+  private LicenseGeneratorServiceInterface defaultImplementor = null;
+
+  public void addImplementor(final AbstractImplementor imp, final boolean isDefault) {
 
     logger.log(Log.Level.debug, imp.technologyId() + " -> " + imp.getClass().getSimpleName());
 
     this.implementors.put(imp.technologyId(), imp);
+
+    if (isDefault) {
+      this.defaultImplementor = imp;
+    }
   }
 
   public LicenseGeneratorServiceInterface getDefaultImplementor() {
-    return this.implementors.get(default_technology_id);
+    return this.defaultImplementor;
   }
 
   public LicenseGeneratorServiceInterface getImplementor(final String id) {

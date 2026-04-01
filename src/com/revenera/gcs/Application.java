@@ -1,5 +1,6 @@
 package com.revenera.gcs;
 
+import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.implementor.AbstractImplementor;
 import com.revenera.gcs.implementor.ImplementorFactory;
 import com.revenera.gcs.utils.AnnotationManager;
@@ -14,9 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-
-
 
 /**
  * The root of the service, registered as a listener will set stuff up when the context is initialized
@@ -29,9 +29,10 @@ public class Application implements ServletContextListener {
   private static final AtomicReference<Application> singleton = new AtomicReference<>();
 
   private static final BuildVersion buildVersion = new BuildVersion(
-      "2026.03.31",
-      "1000",
-      "BETA");
+      "2026.04.01",
+      "1006",
+      "BETA",
+      0x19D48EFFC16L);
 
 
   @SuppressWarnings("unused")
@@ -48,47 +49,71 @@ public class Application implements ServletContextListener {
   }
 
   /** implementor factory */
-  private final ImplementorFactory implementorFactory;
+  private final ImplementorFactory implementorFactory = new ImplementorFactory();
   /** diagnostics */
-  private final Diagnostics diagnostics;
+  private final Diagnostics diagnostics = new Diagnostics();
 
   /** ??? */
   private  String web_inf;
+
+  static {
+    try {
+      //TODO: we can reduce this potentially -- once levels have been assessed
+      Log.setLoggingLevel(Log.Level.trace);
+      logger.in();
+    }
+    catch (final Throwable t) {
+      logger.exception(t);
+    }
+    finally {
+      logger.out();
+    }
+  }
 
   /**
    * CTOR
    */
   public Application() {
-    /// we can reduce this potentially -- once levels have been assessed
-    Log.setLoggingLevel(Log.Level.trace);
+    logger.in();
+    try {
+      singleton.getAndSet(this);
 
-    this.implementorFactory = new ImplementorFactory();
-    this.diagnostics = new Diagnostics();
+      logger.me(this);
 
-    logger.me(this);
-
-    singleton.getAndSet(this);
-
-    logger.array(Log.Level.info, "version", buildVersion.getVersionString());
+      logger.array(Log.Level.info, "version", buildVersion.getVersionString());
+    }
+    catch (final Throwable t) {
+      logger.exception(t);
+    }
+    finally {
+      logger.out();
+    }
   }
 
   /**
    * GETTERS
    */
   public final ImplementorFactory getImplementorFactory() {
-
     return implementorFactory;
   }
 
   public Diagnostics getDiagnostics() {
-
     return diagnostics;
   }
 
   private void logAttributeNames(final ServletContextEvent event) {
-    final Enumeration<String> itt = event.getServletContext().getAttributeNames();
-    while (itt.hasMoreElements()) {
-      logger.log(Log.Level.trace, itt.nextElement());
+    logger.in();
+    try {
+      final Enumeration<String> itt = event.getServletContext().getAttributeNames();
+      while (itt.hasMoreElements()) {
+        logger.log(Log.Level.trace, itt.nextElement());
+      }
+    }
+    catch (final Throwable t) {
+      logger.exception(t);
+    }
+    finally {
+      logger.out();
     }
   }
 
@@ -125,10 +150,17 @@ public class Application implements ServletContextListener {
           logger.array(Log.Level.debug, ann.technology(), type.getName());
 
           if (AbstractImplementor.class.isAssignableFrom(type)) {
-
-            implementorFactory.addImplementor((AbstractImplementor) type.newInstance());
+            implementorFactory.addImplementor((AbstractImplementor) type.newInstance(), ann.isDefault());
           }
         }
+      }
+
+      final LicenseGeneratorServiceInterface implementor = implementorFactory.getDefaultImplementor();
+      if (implementor != null) {
+        logger.array(Log.Level.info, "default implementor", implementor.getClass().getName());
+      }
+      else {
+        throw new RuntimeException("No default implementor found");
       }
     }
     catch (final Throwable t) {

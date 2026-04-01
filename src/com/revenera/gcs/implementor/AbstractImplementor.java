@@ -66,9 +66,11 @@ public abstract class AbstractImplementor implements LicenseGeneratorServiceInte
 
       return new PingResponse() {
         {
-          this.info = Utils.safeSerializeYaml(ApplicationProperties.create());
+          final ApplicationProperties props = ApplicationProperties.create();
 
-          this.str = String.format("%s | %s | %s | %s | %s | %s | %s | %s | %s",
+          this.info = Utils.safeSerializeYaml(props);
+
+          this.str = String.format("%s | %s | %s | %s | %s | %s | %s | %s | %s | %s",
               logger.type().getSimpleName(),
               Application.getBuildVersion().getVersionString(),
               technologyId(),
@@ -77,8 +79,18 @@ public abstract class AbstractImplementor implements LicenseGeneratorServiceInte
               SystemProperties.getOsArch(),
               SystemUtils.getHostName(),
               SystemProperties.getUserName("unknown"),
-              Application.getInstance().getResourcePath().toString());
+              Application.getInstance().getResourcePath().toString(),
+              props.getUpTime().toString());
 
+          this.processedTime = Instant.now().toString();
+        }
+      };
+    }
+    catch (final Throwable t) {
+      return new PingResponse() {
+        {
+          this.info = t.getClass().getName();
+          this.str = t.getMessage();
           this.processedTime = Instant.now().toString();
         }
       };

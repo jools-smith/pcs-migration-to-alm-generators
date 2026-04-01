@@ -1,9 +1,8 @@
-package com.revenera.gcs.implementor.hcl;
+package com.revenera.gcs.implementor;
 
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.revenera.gcs.Application;
-import com.revenera.gcs.implementor.AbstractImplementor;
 import com.revenera.gcs.utils.GeneratorImplementor;
 import com.revenera.gcs.utils.Log;
 
@@ -38,7 +37,7 @@ class Resources {
 }
 
 @SuppressWarnings("unused")
-@GeneratorImplementor(technology = "FNPS")
+@GeneratorImplementor(technology = "FNPS", isDefault = false)
 public class FnpSubscriptionGenerator extends AbstractImplementor {
 
   private final static String licenseFilename = "license";

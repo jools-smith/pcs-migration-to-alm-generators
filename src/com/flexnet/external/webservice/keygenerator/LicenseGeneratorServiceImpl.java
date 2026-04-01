@@ -4,7 +4,6 @@ import com.flexnet.external.type.*;
 import com.revenera.gcs.Application;
 import com.revenera.gcs.ServiceBase;
 import com.revenera.gcs.utils.Diagnostics.Token;
-import com.revenera.gcs.utils.Log;
 
 import javax.jws.WebService;
 
@@ -18,11 +17,13 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
   public PingResponse ping(final PingRequest payload) throws LicGeneratorException {
     super.logger.in();
 
-    super.logger.yaml(Log.Level.trace, payload);
-
     final Token token = createDiagnosticsToken();
     try {
-      return Application.getInstance().getImplementorFactory().getImplementor(payload.getStr()).ping(payload);
+      return Application
+          .getInstance()
+          .getImplementorFactory()
+          .getDefaultImplementor()
+          .ping(payload);
     }
     catch (final Throwable t) {
       throw new LicGeneratorException(t.getMessage(), this.serviceException.apply(t));
