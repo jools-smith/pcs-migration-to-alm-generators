@@ -64,14 +64,14 @@ public final class Log {
       final Context context = new Context();
 
       final String content = String.format("%s %s [%s] {%s} %s.%s(%d) %s",
-                                           context.getTime(),
-                                           level.toString().toUpperCase(),
-                                           Thread.currentThread().getName(),
-                                           type.getSimpleName(),
-                                           Utils.abbreviatePackageName(context.getClassName(), 30),
-                                           context.getMethod(),
-                                           context.getLine(),
-                                           message);
+          context.getTime(),
+          level.toString().toUpperCase(),
+          Thread.currentThread().getName(),
+          type.getSimpleName(),
+          Utils.abbreviatePackageName(context.getClassName(), 30),
+          context.getMethod(),
+          context.getLine(),
+          message);
 
       System.out.println(content);
 
@@ -81,7 +81,10 @@ public final class Log {
 
   public void yaml(final Level level, final Object obj) {
     try {
-      log(level, Utils.safeSerializeYaml(obj));
+      array(level,
+          obj.getClass().getName(),
+          obj.getClass().getSimpleName(),
+          Utils.safeSerializeYaml(obj));
     }
     catch (final Throwable e) {
       exception(e);
@@ -90,7 +93,10 @@ public final class Log {
 
   public void json(final Level level, final Object obj) {
     try {
-      log(level, Utils.safeSerializeJsonIndented(obj));
+      array(level,
+          obj.getClass().getName(),
+          obj.getClass().getSimpleName(),
+          Utils.safeSerializeJsonIndented(obj));
     }
     catch (final Throwable e) {
       exception(e);
@@ -124,7 +130,6 @@ public final class Log {
   }
 
   public void array(final Level level, final Object... params) {
-
     log(level, Arrays.stream(params).map(Object::toString).collect(Collectors.joining(" | ")));
   }
 

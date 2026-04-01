@@ -59,13 +59,28 @@ public class FnpSubscriptionGenerator extends AbstractImplementor {
     try {
       final Resources res = new Resources(technologyId());
 
-      final Path file = Files.createFile(res.getLicenseFilepath().toRealPath());
+      logger.json(Log.Level.debug, request);
+
+      final Path file = Files.createFile(res.getLicenseFilepath().toAbsolutePath());
+      logger.array(Log.Level.debug,"license file path", file.toAbsolutePath());
 
       final ProcessBuilder pb = new ProcessBuilder(
-          res.getExecutablePath().toRealPath().toString(),  // executable path
-          file.toRealPath().toString(),                               // file to write
-          "p1",                                                       // TODO: first param
-          "p2"                                                        // TODO: second param
+          res.getExecutablePath().toAbsolutePath().toString(),  // executable path
+          file.toAbsolutePath().toString(),
+          "================================",
+          "Vendor Name: coriolis",
+          "Product: FlexNet Publisher",
+          "Version: 11",
+          "Platforms: ALL",
+          "TRL: \"Y\"",
+          "--------------------------------",
+          "#define VENDOR_KEY1 0xac361887",
+          "#define VENDOR_KEY2 0x25621cfd",
+          "#define VENDOR_KEY3 0x744a9c30",
+          "#define VENDOR_KEY4 0x3d11d20b",
+          "#define VENDOR_KEY5 0x63702b83",
+          "#define VENDOR_NAME \"coriolis\"",
+          "\"coriolis\" 0x6ff706a1 0x896f965e"
       );
 
       pb.directory(res.getWorkingDirectory().toFile());
@@ -74,6 +89,7 @@ public class FnpSubscriptionGenerator extends AbstractImplementor {
       logger.log(Log.Level.debug, "started process");
 
       final boolean status = proc.waitFor(30, TimeUnit.SECONDS);
+      logger.log(Log.Level.debug, "finished process");
 
       try (final BufferedReader reader =
                new BufferedReader(
@@ -98,6 +114,8 @@ public class FnpSubscriptionGenerator extends AbstractImplementor {
       } // file is deleted here
     }
     catch (final Throwable t) {
+      logger.exception(t);
+
       throw new RuntimeException(t);
     }
   }

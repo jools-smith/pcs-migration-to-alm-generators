@@ -28,12 +28,7 @@ public class Application implements ServletContextListener {
   /** instance */
   private static final AtomicReference<Application> singleton = new AtomicReference<>();
 
-  private static final BuildVersion buildVersion = new BuildVersion(
-      "2026.04.01",
-      "1006",
-      "BETA",
-      0x19D48EFFC16L);
-
+  private static final BuildVersion buildVersion = new BuildVersion();
 
   @SuppressWarnings("unused")
   public static Application singleton() {

@@ -16,6 +16,29 @@
     <property name="warfile" location="${BASE}/pcs-migration-to-alm.war"/>
     <property name="zipped-sources" location="${BASE}/pcs-migration-to-alm.zip"/>
 
+    <property name="build.props" location="build.properties"/>
+
+    <target name="init-buildnumber">
+        <!-- If file doesn't exist, create it with build.number=0 -->
+        <touch file="${build.props}"/>
+
+        <!-- Load existing build.number if present -->
+        <property file="${build.props}"/>
+
+        <!-- Default if missing -->
+        <condition property="build.number" value="0">
+            <not><isset property="build.number"/></not>
+        </condition>
+
+        <!-- Increment and persist -->
+        <propertyfile file="${build.props}">
+            <entry key="build.number" type="int" operation="+" value="1" pattern="0"/>
+        </propertyfile>
+
+        <!-- Reload so ${build.number} is updated in this build -->
+        <property file="${build.props}"/>
+    </target>
+
     <path id="licservice.classpath">
         <fileset dir="${BASE}/WebContent/WEB-INF/lib">
             <include name="**/*.jar"/>
@@ -46,7 +69,7 @@
     </target>
 
     <target name="compile"
-            depends="wsdl2src"
+            depends="wsdl2src, init-buildnumber"
             description="compile the source ">
         <javac srcdir="${generated-src}"
                destdir="${build}"
@@ -59,6 +82,22 @@
                debug="true"
                classpathref="licservice.classpath"
                encoding="utf-8"/>
+
+        <tstamp>
+            <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" timezone="UTC"/>
+            <format property="build.time" pattern="HH:mm:ss" timezone="UTC"/>
+            <format property="build.date" pattern="d MMM yyyy" timezone="UTC"/>
+        </tstamp>
+
+        <!-- this copy works -->
+        <echo file="${build}/revenera.properties">
+build.username=${user.name}
+build.date=${build.date}
+build.time=${build.time}
+build.timestamp=${build.timestamp}
+build.number=${build.number}
+build.category=BETA
+        </echo>
     </target>
 
     <target name="build"

@@ -32,9 +32,24 @@ int main(const int argc, const char* const argv[]) {
       throw runtime_error(std::format("Failed to open file : {}", filepath));
     }
 
-    for (int i = 0; i < argc; i++) {
-      file << argv[i] << endl;
-    }
+    const string vendor = argv[2];
+    
+    file << "================================" << endl;
+    file << "Vendor Name : coriolis" << endl;
+    file << "Product : FlexNet Publisher" << endl;
+    file << "Version : 11" << endl;
+    file << "Platforms : ALL" << endl;
+    file << "TRL : \"Y\"" << endl;
+    file << endl;
+    file << "--------------------------------" << endl;
+    file << "#define VENDOR_KEY1 0xac361887" << endl;
+    file << "#define VENDOR_KEY2 0x25621cfd" << endl;
+    file << "#define VENDOR_KEY3 0x744a9c30" << endl;
+    file << "#define VENDOR_KEY4 0x3d11d20b" << endl;
+    file << "#define VENDOR_KEY5 0x63702b83" << endl;
+    file << "#define VENDOR_NAME \"coriolis\"" << endl;
+    file << endl;
+    file << "\"coriolis\" 0x6ff706a1 0x896f965e" << endl;
 
     file.flush();
 
