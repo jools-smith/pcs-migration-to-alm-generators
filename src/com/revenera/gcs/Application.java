@@ -3,6 +3,7 @@ package com.revenera.gcs;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.implementor.AbstractImplementor;
 import com.revenera.gcs.implementor.ImplementorFactory;
+import com.revenera.gcs.implementor.TechnologyProperties;
 import com.revenera.gcs.utils.AnnotationManager;
 import com.revenera.gcs.utils.Diagnostics;
 import com.revenera.gcs.utils.GeneratorImplementor;
@@ -15,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -142,10 +142,19 @@ public class Application implements ServletContextListener {
 
           final GeneratorImplementor ann = type.getAnnotation(GeneratorImplementor.class);
 
-          logger.array(Log.Level.debug, ann.technology(), type.getName());
+          logger.array(Log.Level.debug, "found annotation",
+              ann.technologyId(),
+              ann.technologyName(),
+              ann.isDefault(),
+              type.getName());
 
           if (AbstractImplementor.class.isAssignableFrom(type)) {
-            implementorFactory.addImplementor((AbstractImplementor) type.newInstance(), ann.isDefault());
+
+            final AbstractImplementor imp = (AbstractImplementor) type.newInstance();
+
+            imp.configureTechnologyProperties(ann.technologyId(), ann.technologyName());
+
+            implementorFactory.addImplementor(imp, ann.isDefault());
           }
         }
       }

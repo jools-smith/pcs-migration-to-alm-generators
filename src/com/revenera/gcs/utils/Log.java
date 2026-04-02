@@ -49,7 +49,7 @@ public final class Log {
 
     if (Files.exists(Paths.get(root))) {
       try {
-        final File file = Paths.get(root, LocalDate.now() + "-revenera.log").toAbsolutePath().toFile();
+        final File file = Paths.get(root, LocalDate.now() + ".revenera.log").toAbsolutePath().toFile();
 
         FileUtils.writeLines(file, Collections.singletonList(content), true);
       }

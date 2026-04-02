@@ -3,24 +3,13 @@ package com.revenera.gcs.implementor;
 import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.revenera.gcs.utils.GeneratorImplementor;
-import com.revenera.gcs.utils.Log;
 import com.revenera.gcs.utils.Utils;
 
 import java.time.Instant;
 import java.util.ArrayList;
 
-@GeneratorImplementor(technology = "DEF", isDefault = true)
+@GeneratorImplementor(technologyId = "DEF", technologyName = "Default License Technology", isDefault = true)
 public final class DefaultLicenseGenerator extends AbstractImplementor {
-
-  @Override
-  public String technologyId() {
-    return "DEF";
-  }
-
-  @Override
-  public String technologyName() {
-    return "Default License Technology";
-  }
 
   @Override
   public Status validateProduct(final ProductRequest product) {

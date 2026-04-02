@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -37,20 +39,8 @@ class Resources {
 }
 
 @SuppressWarnings("unused")
-@GeneratorImplementor(technology = "FNPS", isDefault = false)
-public class FnpSubscriptionGenerator extends AbstractImplementor {
-
-  private final static String licenseFilename = "license";
-
-  @Override
-  public String technologyName() {
-    return "FNP Subscription License Technology";
-  }
-
-  @Override
-  public String technologyId() {
-    return "FNPS";
-  }
+@GeneratorImplementor(technologyId = "FNPS", technologyName = "FNP Subscription License Technology", isDefault = false)
+public class FNPS_LicenseGenerator extends AbstractImplementor {
 
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
@@ -98,12 +88,15 @@ public class FnpSubscriptionGenerator extends AbstractImplementor {
 
         return new GeneratorResponse() {
           {
-            this.licenseFiles = Collections.singletonList(new LicenseFileMapItem() {
-              {
-                name = licenseFilename;
-                value = reader.lines().collect(Collectors.joining("\n"));
-              }
-            });
+            this.licenseFiles = request.getLicenseTechnology().getLicenseFileDefinitions()
+                .stream()
+                .filter(x -> x.getLicenseStorageType() == LicenseFileTypeENC.TEXT)
+                .map(x -> (new LicenseFileMapItem() {
+                  {
+                    name = x.getName();
+                    value = reader.lines().collect(Collectors.joining("\n"));
+                  }
+                })).collect(Collectors.toList());
 
             this.complete = true;
 
@@ -123,27 +116,36 @@ public class FnpSubscriptionGenerator extends AbstractImplementor {
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
 
-    logger.array(Log.Level.debug, Application.getBuildVersion().getDate(), Application.getBuildVersion().getSequence());
+    try {
+      logger.array(Log.Level.debug, Application.getBuildVersion().getDate(), Application.getBuildVersion().getSequence());
 
-    return new ConsolidatedLicense() {
-      {
-        this.fulfillments = request.getFulfillments();
+      logger.json(Log.Level.debug, request);
+      return new ConsolidatedLicense() {
+        {
+          this.fulfillments = request.getFulfillments();
 
-        this.licFiles = Collections.singletonList(new LicenseFileMapItem() {
-          {
-            this.name = licenseFilename;
+          this.licFiles = request.getFulfillments().stream()
+              .filter(x -> x.getLicenseFileType() == LicenseFileTypeENC.TEXT)
+              .flatMap(fid -> fid.getLicenseFiles().stream())
+              .collect(Collectors.groupingBy(LicenseFileMapItem::getName))
+              .entrySet().stream()
+              .map(x ->new LicenseFileMapItem() {
+                {
+                  this.name = x.getKey();
+                  this.value = x.getValue().stream()
+                      .map(x -> x.getValue().toString())
+                      .collect(Collectors.joining("\n"));
+                }
+              }).collect(Collectors.toList());
 
-            this.value = request.getFulfillments().stream()
-                .flatMap(fid -> fid.getLicenseFiles().stream())
-                .filter(file -> file.getName().equals(licenseFilename))
-                .map(file -> file.getValue().toString())
-                .collect(Collectors.joining("\n"));
-          }
-        });
-
-        // debug
-        this.licFiles.forEach(file -> logger.array(Log.Level.debug, file.getName(), file.getValue()));
-      }
-    };
+          // debug
+          this.licFiles.forEach(file -> logger.array(Log.Level.debug, file.getName(), file.getValue()));
+        }
+      };
+    }
+    catch (final Throwable t) {
+      logger.exception(t);
+      throw new RuntimeException(t);
+    }
   }
 }

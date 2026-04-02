@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public abstract class AbstractImplementor implements LicenseGeneratorServiceInterface {
+public abstract class AbstractImplementor implements TechnologyProperties, LicenseGeneratorServiceInterface {
 
   protected final Log logger = Log.create(this.getClass());
 
@@ -57,6 +57,30 @@ public abstract class AbstractImplementor implements LicenseGeneratorServiceInte
         });
       }
     };
+  }
+
+  private static class Technology {
+    protected String name;
+    protected String id;
+  }
+
+  private final Technology technology = new Technology();
+  // TECHNOLOGY PROPS
+
+  @Override
+  public void configureTechnologyProperties(final String id, final String name) {
+    this.technology.id = id;
+    this.technology.name = name;
+  }
+
+  @Override
+  public String technologyId() {
+   return this.technology.id;
+  }
+
+  @Override
+  public String technologyName() {
+    return this.technology.name;
   }
 
   @Override
@@ -153,9 +177,4 @@ public abstract class AbstractImplementor implements LicenseGeneratorServiceInte
   public String generateCustomHostIdentifier(final HostIdRequest hostIdReq) throws LicGeneratorException {
     return except(String.class, "generateCustomHostIdentifier not implemented");
   }
-
-  @SuppressWarnings("unused")
-  public abstract String technologyName();
-
-  public abstract String technologyId();
 }

@@ -8,6 +8,7 @@ import java.lang.annotation.Target;
 @Retention( RetentionPolicy.RUNTIME )
 @Target(ElementType.TYPE)
 public @interface GeneratorImplementor {
-    String technology();
+    String technologyId();
+    String technologyName();
     boolean isDefault();
 }
