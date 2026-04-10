@@ -16,6 +16,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -75,7 +78,7 @@ public class Application implements ServletContextListener {
 
       logger.me(this);
 
-      logger.array(Log.Level.info, "version", buildVersion.getVersionString());
+      logger.array(Log.Level.info, "version", buildVersion.getVersionDetails());
     }
     catch (final Throwable t) {
       logger.exception(t);
@@ -119,12 +122,63 @@ public class Application implements ServletContextListener {
   /**
    *
    */
+  private ScheduledExecutorService scheduler;
+
+  private void housekeeping() {
+    logger.in();
+    try {
+      logger.json(Log.Level.debug, this.diagnostics.serialize());
+    }
+    catch (final Throwable t) {
+      logger.exception(t);
+    }
+  }
+
+  private void startup() {
+    // TODO SCHEDULE
+    scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
+      Thread t = new Thread(r, "myapp-housekeeping");
+      t.setDaemon(false); // can be true, but don't rely on daemon for cleanup
+      t.setContextClassLoader(Application.class.getClassLoader());
+      return t;
+    });
+
+    scheduler.scheduleAtFixedRate(this::housekeeping, 0, 1, TimeUnit.MINUTES);
+    // TODO SCHEDULE
+  }
+
+  private void shutdown() {
+    logger.in();
+    if (scheduler != null) {
+      scheduler.shutdown();                 // stop accepting new tasks
+      try {
+        // try 3 times
+        for (int i = 0; i < 3; i++) {
+          logger.log(Log.Level.trace, "scheduler await termination");
+
+          if (scheduler.awaitTermination(10, TimeUnit.SECONDS)) {
+            logger.log(Log.Level.trace, "scheduler terminated");
+            break;
+          }
+          scheduler.shutdownNow();
+        }
+      }
+      catch (final InterruptedException ie) {
+        logger.exception(ie);
+        scheduler.shutdownNow();
+        Thread.currentThread().interrupt();
+      }
+    }
+  }
+
   @Override
   public void contextInitialized(final ServletContextEvent event) {
     logger.in();
 
     try {
       logAttributeNames(event);
+
+      startup();
 
       this.web_inf = event.getServletContext().getRealPath("/WEB-INF");
 
@@ -178,14 +232,13 @@ public class Application implements ServletContextListener {
   /**
    *
    */
+
+
   @Override
   public void contextDestroyed(final ServletContextEvent event) {
     logger.in();
     try {
-      logAttributeNames(event);
-    }
-    catch (final Throwable t) {
-      logger.exception(t);
+      shutdown();
     }
     finally {
       logger.out();

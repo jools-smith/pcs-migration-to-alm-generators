@@ -35,7 +35,7 @@ public final class DefaultLicenseGenerator extends AbstractImplementor {
 
   @Override
   public GeneratorResponse generateLicense(GeneratorRequest request) throws LicGeneratorException {
-
+    logger.in();
     return new GeneratorResponse() {
       {
         this.licenseFiles = makeLicenseFiles(

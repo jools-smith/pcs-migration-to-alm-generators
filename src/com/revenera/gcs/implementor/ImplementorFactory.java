@@ -33,7 +33,7 @@ public class ImplementorFactory {
     if (this.implementors.containsKey(id)) {
       final LicenseGeneratorServiceInterface impl = this.implementors.get(id);
 
-      logger.me(impl);
+//      logger.me(impl);
 
       return this.implementors.get(id);
     }

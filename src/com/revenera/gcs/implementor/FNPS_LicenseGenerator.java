@@ -12,9 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -45,13 +42,11 @@ public class FNPS_LicenseGenerator extends AbstractImplementor {
   @Override
   public GeneratorResponse generateLicense(final GeneratorRequest request) throws LicGeneratorException {
     logger.in();
-
     try {
       final Resources res = new Resources(technologyId());
 
-      logger.json(Log.Level.debug, request);
-
       final Path file = Files.createFile(res.getLicenseFilepath().toAbsolutePath());
+
       logger.array(Log.Level.debug,"license file path", file.toAbsolutePath());
 
       final ProcessBuilder pb = new ProcessBuilder(
@@ -101,25 +96,21 @@ public class FNPS_LicenseGenerator extends AbstractImplementor {
             this.complete = true;
 
             // debug
-            this.licenseFiles.forEach(file -> logger.array(Log.Level.debug, file.getName(), file.getValue()));
+            //this.licenseFiles.forEach(file -> logger.array(Log.Level.debug, file.getName(), file.getValue()));
           }
         };
       } // file is deleted here
     }
     catch (final Throwable t) {
       logger.exception(t);
-
       throw new RuntimeException(t);
     }
   }
 
   @Override
   public ConsolidatedLicense consolidateFulfillments(final FulfillmentRecordSet request) throws LicGeneratorException {
-
+    logger.in();
     try {
-      logger.array(Log.Level.debug, Application.getBuildVersion().getDate(), Application.getBuildVersion().getSequence());
-
-      logger.json(Log.Level.debug, request);
       return new ConsolidatedLicense() {
         {
           this.fulfillments = request.getFulfillments();
@@ -139,7 +130,7 @@ public class FNPS_LicenseGenerator extends AbstractImplementor {
               }).collect(Collectors.toList());
 
           // debug
-          this.licFiles.forEach(file -> logger.array(Log.Level.debug, file.getName(), file.getValue()));
+          //this.licFiles.forEach(file -> logger.array(Log.Level.debug, file.getName(), file.getValue()));
         }
       };
     }

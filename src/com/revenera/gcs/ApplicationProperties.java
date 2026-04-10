@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.function.Function;
 
 public class ApplicationProperties {
@@ -20,6 +18,7 @@ public class ApplicationProperties {
   public final Map<String,Object> os;
   public final Map<String,Object> java;
   public final Map<String,Object> build;
+  public final Object diagnostics;
 
   ApplicationProperties() {
 
@@ -27,11 +26,11 @@ public class ApplicationProperties {
       {
         final BuildVersion bv = Application.getBuildVersion();
 
+        put("VERSION", bv.getVersion());
         put("TIMESTAMP", bv.getTimeStamp());
         put("DATE", bv.getDate());
         put("TIME", bv.getTime());
         put("RELEASE", bv.getRelease());
-        put("NUMBER", bv.getSequence());
         put("USER", bv.getUser());
       }
     };
@@ -75,6 +74,8 @@ public class ApplicationProperties {
         put("JAVA_VM_INFO", SystemUtils.JAVA_VM_INFO);
       }
     };
+
+    this.diagnostics = Application.getInstance().getDiagnostics().serialize();
   }
 
   @JsonIgnore

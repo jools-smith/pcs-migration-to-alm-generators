@@ -99,6 +99,7 @@ public final class Diagnostics {
   }
 
   public Diagnostics() {
+
     logger.me(this);
   }
 

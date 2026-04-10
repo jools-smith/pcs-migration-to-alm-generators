@@ -11,10 +11,9 @@ import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class AbstractImplementor implements TechnologyProperties, LicenseGeneratorServiceInterface {
 
@@ -94,17 +93,44 @@ public abstract class AbstractImplementor implements TechnologyProperties, Licen
 
           this.info = Utils.safeSerializeYaml(props);
 
-          this.str = String.format("%s | %s | %s | %s | %s | %s | %s | %s | %s | %s",
-              logger.type().getSimpleName(),
-              Application.getBuildVersion().getVersionString(),
-              technologyId(),
-              SystemProperties.getOsName(),
-              SystemProperties.getOsVersion(),
-              SystemProperties.getOsArch(),
-              SystemUtils.getHostName(),
-              SystemProperties.getUserName("unknown"),
-              Application.getInstance().getResourcePath().toString(),
-              props.getUpTime().toString());
+          class Bag {
+            final Map<String, Object> elements = new LinkedHashMap<>();
+
+            Bag with(final String key, final Object... values) {
+
+              this.elements.put(key, Arrays
+                  .stream(values)
+                  .map(Object::toString)
+                  .collect(Collectors.joining(" | ")));
+
+              return this;
+            }
+
+            String build() {
+              return this.elements.entrySet()
+                  .stream()
+                  .map(e -> e.getKey() + ": " + e.getValue())
+                  .collect(Collectors.joining("\n"));
+            }
+          }
+
+          this.str = new Bag()
+              .with("imp", logger.type().getSimpleName(), technologyId())
+              .with("ver",
+                  Application.getBuildVersion().getVersion(),
+                  Application.getBuildVersion().getDate(),
+                  Application.getBuildVersion().getTime())
+              .with("sys",
+                  SystemProperties.getOsName(),
+                  SystemProperties.getOsVersion(),
+                  SystemProperties.getOsArch()
+                  )
+              .with("host",
+                  SystemUtils.getHostName(),
+                  SystemProperties.getUserName("unknown"))
+              .with("path", Application.getInstance().getResourcePath())
+              .with("up",props.getUpTime())
+              .build();
 
           this.processedTime = Instant.now().toString();
         }
@@ -118,9 +144,6 @@ public abstract class AbstractImplementor implements TechnologyProperties, Licen
           this.processedTime = Instant.now().toString();
         }
       };
-    }
-    finally {
-      logger.out();
     }
   }
 

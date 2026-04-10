@@ -63,7 +63,7 @@ public abstract class ServiceBase {
       throw new RuntimeException(obj.getClass().getName() + " | cannot retrieve license technology");
     }
     else {
-      this.logger.log(Log.Level.info, "license tech:" + tech.get().getName());
+//      this.logger.log(Log.Level.info, "license tech:" + tech.get().getName());
       return tech.get().getName();
     }
   }

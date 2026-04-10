@@ -59,7 +59,7 @@ public final class Log {
     }
   }
 
-  public void log(final Level level, final String message) {
+  synchronized public void log(final Level level, final String message) {
     if (willLog(level)) {
       final Context context = new Context();
 
