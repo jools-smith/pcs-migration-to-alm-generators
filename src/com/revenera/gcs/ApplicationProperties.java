@@ -32,6 +32,9 @@ public class ApplicationProperties {
         put("TIME", bv.getTime());
         put("RELEASE", bv.getRelease());
         put("USER", bv.getUser());
+        put("LOGGING_LEVEL", bv.getLoggingLevel());
+        put("LOGGING_ROOT", bv.getLoggingRoot());
+        put("HOUSEKEEPING", bv.getHousekeepingFrequency());
       }
     };
 

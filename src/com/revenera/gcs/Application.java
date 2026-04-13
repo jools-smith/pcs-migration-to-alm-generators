@@ -56,8 +56,13 @@ public class Application implements ServletContextListener {
 
   static {
     try {
-      //TODO: we can reduce this potentially -- once levels have been assessed
-      Log.setLoggingLevel(Log.Level.trace);
+
+      Log.setLoggingLevel(
+          Log.Level.valueOf(
+              buildVersion.getLoggingLevel().toLowerCase()));
+
+      Log.setLoggingRoot(buildVersion.getLoggingRoot());
+
       logger.in();
     }
     catch (final Throwable t) {
@@ -134,7 +139,7 @@ public class Application implements ServletContextListener {
     }
   }
 
-  private void startup() {
+  private void startup(final int delay,final int period) {
     // TODO SCHEDULE
     scheduler = Executors.newSingleThreadScheduledExecutor(r -> {
       Thread t = new Thread(r, "myapp-housekeeping");
@@ -143,7 +148,7 @@ public class Application implements ServletContextListener {
       return t;
     });
 
-    scheduler.scheduleAtFixedRate(this::housekeeping, 0, 1, TimeUnit.MINUTES);
+    scheduler.scheduleAtFixedRate(this::housekeeping, delay, period, TimeUnit.MINUTES);
     // TODO SCHEDULE
   }
 
@@ -178,7 +183,7 @@ public class Application implements ServletContextListener {
     try {
       logAttributeNames(event);
 
-      startup();
+      startup(0, buildVersion.getHousekeepingFrequency());
 
       this.web_inf = event.getServletContext().getRealPath("/WEB-INF");
 

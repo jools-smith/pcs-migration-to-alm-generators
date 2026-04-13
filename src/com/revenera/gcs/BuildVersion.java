@@ -1,7 +1,6 @@
 package com.revenera.gcs;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,7 +18,12 @@ public final class BuildVersion {
     TIME("build.time"),
 
     USER("build.username"),
-    RELEASE("build.category");
+    RELEASE("build.category"),
+
+    LOGGING_THRESHOLD("app.logging.level"),
+    LOGGING_ROOT("app.logging.root"),
+    HOUSEKEEPING_INTERVAL("app.housekeeping");
+
     final String name;
     Items(String name) {
       this.name = name;
@@ -63,6 +67,18 @@ public final class BuildVersion {
 
   public String getTimestamp() {
     return this.properties.get(Items.TIMESTAMP).toString();
+  }
+
+  public int getHousekeepingFrequency() {
+    return Integer.parseInt(this.properties.get(Items.HOUSEKEEPING_INTERVAL).toString());
+  }
+
+  public String getLoggingLevel() {
+    return this.properties.get(Items.LOGGING_THRESHOLD).toString();
+  }
+
+  public String getLoggingRoot() {
+    return this.properties.get(Items.LOGGING_ROOT).toString();
   }
 
   public String getUser() {

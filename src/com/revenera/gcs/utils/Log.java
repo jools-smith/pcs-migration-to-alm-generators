@@ -22,6 +22,8 @@ public final class Log {
   static final DateFormat df = new SimpleDateFormat("dd-MMM-yyyy hh:mm:ss.zzz");
 
   static AtomicReference<Log.Level> loggingLevel = new AtomicReference<>(Log.Level.trace);
+  static AtomicReference<String> loggingRoot = new AtomicReference<>("c:\\revenera");
+
   private final Class<?> type;
 
   private Log(final Class<?> cls) {
@@ -33,7 +35,13 @@ public final class Log {
   }
 
   public static Log.Level setLoggingLevel(final Log.Level level) {
+
     return loggingLevel.getAndSet(level);
+  }
+
+  public static String setLoggingRoot(final String root) {
+
+    return loggingRoot.getAndSet(root);
   }
 
   public static Log create(final Class<?> type) {
@@ -45,7 +53,7 @@ public final class Log {
   }
 
   public void dump(final String content) {
-    final String root = "c:\\revenera";
+    final String root = loggingRoot.get();
 
     if (Files.exists(Paths.get(root))) {
       try {

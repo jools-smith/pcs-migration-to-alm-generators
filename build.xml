@@ -3,67 +3,69 @@
         Web Services build file
     </description>
 
-    <property environment="env"/>
+    <property environment="env" />
 
-    <property name="BASE" location="."/>
-    <property name="src" location="${BASE}/src"/>
-    <property name="build" location="${BASE}/build"/>
-    <property name="dist" location="${BASE}/dist"/>
-    <property name="webcontent" location="${BASE}/WebContent"/>
-    <property name="generated" location="${BASE}/generated"/>
-    <property name="generated-src" location="${BASE}/generated/src"/>
-    <property name="schema-loc" location="${BASE}/schema"/>
-    <property name="warfile" location="${BASE}/pcs-migration-to-alm.war"/>
-    <property name="zipped-sources" location="${BASE}/pcs-migration-to-alm.zip"/>
+    <property name="BASE" location="." />
+    <property name="src" location="${BASE}/src" />
+    <property name="build" location="${BASE}/build" />
+    <property name="dist" location="${BASE}/dist" />
+    <property name="webcontent" location="${BASE}/WebContent" />
+    <property name="generated" location="${BASE}/generated" />
+    <property name="generated-src" location="${BASE}/generated/src" />
+    <property name="schema-loc" location="${BASE}/schema" />
+    <property name="warfile" location="${BASE}/pcs-migration-to-alm.war" />
+    <property name="zipped-sources" location="${BASE}/pcs-migration-to-alm.zip" />
 
-    <property name="build.props" location="build.properties"/>
+    <property name="build.props" location="build.properties" />
 
     <target name="init-buildnumber">
         <!-- If file doesn't exist, create it with build.number=0 -->
-        <touch file="${build.props}"/>
+        <touch file="${build.props}" />
 
         <!-- Load existing build.number if present -->
-        <property file="${build.props}"/>
+        <property file="${build.props}" />
 
         <!-- Default if missing -->
         <condition property="build.number" value="0">
-            <not><isset property="build.number"/></not>
+            <not>
+                <isset property="build.number" />
+            </not>
         </condition>
 
         <!-- Increment and persist -->
         <propertyfile file="${build.props}">
-            <entry key="build.number" type="int" operation="+" value="1" pattern="0"/>
+            <entry key="build.number" type="int" operation="+" value="1" pattern="0" />
         </propertyfile>
 
         <!-- Reload so ${build.number} is updated in this build -->
-        <property file="${build.props}"/>
+        <property file="${build.props}" />
     </target>
 
     <path id="licservice.classpath">
         <fileset dir="${BASE}/WebContent/WEB-INF/lib">
-            <include name="**/*.jar"/>
+            <include name="**/*.jar" />
         </fileset>
     </path>
 
     <target name="init" depends="clean">
-        <tstamp/>
-        <mkdir dir="${build}"/>
-        <mkdir dir="${generated-src}"/>
+        <tstamp />
+        <mkdir dir="${build}" />
+        <mkdir dir="${generated-src}" />
     </target>
 
     <target name="wsdl2src" depends="init" description="generate source from wsdl">
         <taskdef name="jaxws"
                  classname="com.sun.tools.ws.ant.WsImport"
-                 classpathref="licservice.classpath"/>
+                 classpathref="licservice.classpath" />
 
         <jaxws wsdl="${BASE}/schema/LicenseGeneratorService.wsdl"
                sourcedestdir="${generated-src}"
                keep="true"
                binding="${BASE}/schema/common-types.xml"
                xnocompile="true">
-            <depends file="${BASE}/schema/LicenseGeneratorService.wsdl"/>
-            <produces dir="${generated-src}/com/flexnet/external/webservice/keygenerator"/>
-            <xjcarg value="-Xcollection-setter-injector"/>
+            <depends file="${BASE}/schema/LicenseGeneratorService.wsdl" />
+            <produces dir="${generated-src}/com/flexnet/external/webservice/keygenerator" />
+            <xjcarg value="-Xcollection-setter-injector" />
         </jaxws>
 
     </target>
@@ -75,31 +77,32 @@
                destdir="${build}"
                includeantruntime="false"
                debug="true"
-               encoding="utf-8"/>
+               encoding="utf-8" />
         <javac srcdir="${src}"
                destdir="${build}"
                includeantruntime="false"
                debug="true"
                classpathref="licservice.classpath"
-               encoding="utf-8"/>
+               encoding="utf-8" />
 
         <tstamp>
-            <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" timezone="UTC"/>
-            <format property="build.time" pattern="HH:mm:ss" timezone="UTC"/>
-            <format property="build.date" pattern="d MMM yyyy" timezone="UTC"/>
+            <format property="build.timestamp" pattern="yyyy-MM-dd'T'HH:mm:ss'Z'" timezone="UTC" />
+            <format property="build.time" pattern="HH:mm:ss" timezone="UTC" />
+            <format property="build.date" pattern="d MMM yyyy" timezone="UTC" />
         </tstamp>
 
         <!-- this copy works -->
         <echo file="${build}/revenera.properties">
 build.version.major=0
-build.version.minor=B
+build.version.minor=D
 build.number=${build.number}
 build.timestamp=${build.timestamp}
 build.date=${build.date}
 build.time=${build.time}
 build.category=BETA
 build.username=${user.name}
-app.logging=TRACE
+app.logging.level=TRACE
+app.logging.root=c:\\revenera
 app.housekeeping=60
         </echo>
     </target>
@@ -107,57 +110,34 @@ app.housekeeping=60
     <target name="build"
             depends="compile"
             description="generate the distribution war">
-        <mkdir dir="${dist}/war"/>
+        <mkdir dir="${dist}/war" />
         <copy todir="${dist}/war/build/WEB-INF/">
-            <fileset dir="${webcontent}/WEB-INF/"/>
+            <fileset dir="${webcontent}/WEB-INF/" />
         </copy>
         <copy todir="${dist}/war/build/WEB-INF/classes/">
-            <fileset dir="${build}"/>
+            <fileset dir="${build}" />
         </copy>
         <copy todir="${dist}/war/build/WEB-INF/wsdl/schema">
-            <fileset dir="${schema-loc}"/>
+            <fileset dir="${schema-loc}" />
         </copy>
-        <jar jarfile="${warfile}" basedir="${dist}/war/build/"/>
-        <!-- <delete dir="${dist}" />
-        <delete dir="${generated-src}" />
-        <delete dir="${generated}" />
-        <delete dir="${build}" /> -->
+        <jar jarfile="${warfile}" basedir="${dist}/war/build/" />
 
-        <zip destfile="${zipped-sources}" basedir="${BASE}"/>
+        <zip destfile="${zipped-sources}" basedir="${BASE}" />
     </target>
 
-    <target name="deploy" depends="build">
-        <copy tofile="${env.TOMCAT_HOME}/webapps/licgen.war" file="${warfile}"/>
-        <echo message=""/>
+    <!-- <target name="deploy" depends="build">
+        <copy tofile="${env.TOMCAT_HOME}/webapps/licgen.war" file="${warfile}" />
+        <echo message="" />
         <echo
-                message="Once the tomcat is running, the services can be connected from FNO using http://server:port/licgen/services/LicenseGeneratorService, where licgen is the context root."/>
-    </target>
+            message="Once the tomcat is running, the services can be connected from FNO using http://server:port/licgen/services/LicenseGeneratorService, where licgen is the context root." />
+    </target> -->
 
     <target name="clean" description="clean up">
-        <!--
-            <fail message="${warfile} is not writeable. Did you check this file out?">
-              <condition>
-                <not>
-                  <isfileselected file="${warfile}">
-                    <writable />
-                  </isfileselected>
-                </not>
-              </condition>
-            </fail>
-            <fail message="${zipped-sources} is not writeable. Did you check this file out?">
-              <condition>
-                <not>
-                  <isfileselected file="${zipped-sources}">
-                    <writable />
-                  </isfileselected>
-                </not>
-              </condition>
-            </fail> -->
-        <delete file="${warfile}"/>
-        <delete file="${zipped-sources}"/>
-        <delete dir="${build}"/>
-        <delete dir="${dist}"/>
-        <delete dir="${generated-src}"/>
-        <delete dir="${generated}"/>
+        <delete file="${warfile}" />
+        <delete file="${zipped-sources}" />
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
+        <delete dir="${generated-src}" />
+        <delete dir="${generated}" />
     </target>
 </project>
