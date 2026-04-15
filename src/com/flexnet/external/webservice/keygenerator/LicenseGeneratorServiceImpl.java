@@ -4,7 +4,8 @@ import com.flexnet.external.type.*;
 import com.revenera.gcs.Application;
 import com.revenera.gcs.ServiceBase;
 import com.revenera.gcs.utils.Diagnostics.Token;
-import com.revenera.gcs.utils.Log;
+import com.revenera.gcs.utils.log.Level;
+import com.revenera.gcs.utils.log.Log;
 
 import javax.jws.WebService;
 
@@ -19,7 +20,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
     logger.in();
     final Token token = createDiagnosticsToken();
     try {
-      logger.json(Log.Level.debug, payload);
+      logger.json(Level.debug, payload);
       return Application
           .getInstance()
           .getImplementorFactory()
@@ -40,7 +41,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
     logger.in();
     final Token token = createDiagnosticsToken();
     try {
-      logger.json(Log.Level.debug, payload);
+      logger.json(Level.debug, payload);
       final String tech = super.getLicenseTechnology(payload);
 
       return Application.getInstance().getImplementorFactory().getImplementor(tech).validateProduct(payload);
@@ -59,7 +60,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
     logger.in();
     final Token token = createDiagnosticsToken();
     try {
-      logger.json(Log.Level.debug, payload);
+      logger.json(Level.debug, payload);
       final String tech = super.getLicenseTechnology(payload);
 
       return Application.getInstance().getImplementorFactory().getImplementor(tech).validateLicenseModel(payload);
@@ -78,7 +79,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
     logger.in();
     final Token token = createDiagnosticsToken();
     try {
-      logger.json(Log.Level.debug, payload);
+      logger.json(Level.debug, payload);
 
       final String tech = super.getLicenseTechnology(payload);
 
@@ -98,7 +99,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
     logger.in();
     final Token token = createDiagnosticsToken();
     try {
-      logger.json(Log.Level.debug, payload);
+      logger.json(Level.debug, payload);
       final String tech = super.getLicenseTechnology(payload);
 
       return Application.getInstance().getImplementorFactory().getImplementor(tech).consolidateFulfillments(payload);
@@ -117,7 +118,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
     logger.in();
     final Token token = createDiagnosticsToken();
     try {
-      logger.json(Log.Level.debug, payload);
+      logger.json(Level.debug, payload);
       final String tech = super.getLicenseTechnology(payload);
 
       return Application.getInstance().getImplementorFactory().getImplementor(tech).generateLicenseFilenames(payload);
@@ -138,7 +139,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
     logger.in();
     final Token token = createDiagnosticsToken();
     try {
-      logger.json(Log.Level.debug, payload);
+      logger.json(Level.debug, payload);
       final String tech = super.getLicenseTechnology(payload);
 
       return Application.getInstance().getImplementorFactory().getImplementor(tech).generateConsolidatedLicenseFilenames(payload);
@@ -157,7 +158,7 @@ public class LicenseGeneratorServiceImpl extends ServiceBase implements LicenseG
     logger.in();
     final Token token = createDiagnosticsToken();
     try {
-      logger.json(Log.Level.debug, payload);
+      logger.json(Level.debug, payload);
       return Application.getInstance().getImplementorFactory().getDefaultImplementor().generateCustomHostIdentifier(payload);
     }
     catch (final Throwable t) {

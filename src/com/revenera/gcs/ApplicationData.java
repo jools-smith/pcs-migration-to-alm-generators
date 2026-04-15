@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public class ApplicationProperties {
+public class ApplicationData {
   private final static Instant started = Instant.now();
 
   public final Map<String,Object> sys;
@@ -20,11 +20,11 @@ public class ApplicationProperties {
   public final Map<String,Object> build;
   public final Object diagnostics;
 
-  ApplicationProperties() {
+  ApplicationData() {
 
     this.build = new LinkedHashMap<String, Object>() {
       {
-        final BuildVersion bv = Application.getBuildVersion();
+        final ApplicationProiperties bv = Application.getApplicationProperties();
 
         put("VERSION", bv.getVersion());
         put("TIMESTAMP", bv.getTimeStamp());
@@ -86,8 +86,8 @@ public class ApplicationProperties {
     return Duration.between(started, Instant.now());
   }
 
-  public static ApplicationProperties create() {
-    return new ApplicationProperties();
+  public static ApplicationData create() {
+    return new ApplicationData();
   }
 
 }

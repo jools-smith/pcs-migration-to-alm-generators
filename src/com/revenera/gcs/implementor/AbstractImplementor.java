@@ -4,16 +4,15 @@ import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.Application;
-import com.revenera.gcs.ApplicationProperties;
-import com.revenera.gcs.utils.Log;
+import com.revenera.gcs.ApplicationData;
 import com.revenera.gcs.utils.Utils;
+import com.revenera.gcs.utils.log.Log;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public abstract class AbstractImplementor implements TechnologyProperties, LicenseGeneratorServiceInterface {
 
@@ -89,7 +88,7 @@ public abstract class AbstractImplementor implements TechnologyProperties, Licen
 
       return new PingResponse() {
         {
-          final ApplicationProperties props = ApplicationProperties.create();
+          final ApplicationData props = ApplicationData.create();
 
           this.info = Utils.safeSerializeYaml(props);
 
@@ -117,9 +116,9 @@ public abstract class AbstractImplementor implements TechnologyProperties, Licen
           this.str = new Bag()
               .with("imp", logger.type().getSimpleName(), technologyId())
               .with("ver",
-                  Application.getBuildVersion().getVersion(),
-                  Application.getBuildVersion().getDate(),
-                  Application.getBuildVersion().getTime())
+                  Application.getApplicationProperties().getVersion(),
+                  Application.getApplicationProperties().getDate(),
+                  Application.getApplicationProperties().getTime())
               .with("sys",
                   SystemProperties.getOsName(),
                   SystemProperties.getOsVersion(),

@@ -8,7 +8,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public final class BuildVersion {
+public final class ApplicationProiperties {
   enum Items {
     TIMESTAMP("build.timestamp"),
     VERSION_MAJOR("build.version.major"),
@@ -32,10 +32,10 @@ public final class BuildVersion {
 
   private final Map<Items,Object> properties = new LinkedHashMap<>();
 
-  public BuildVersion() {
+  public ApplicationProiperties() {
     try {
       final Properties props = new Properties();
-      props.load(ApplicationProperties.class.getResourceAsStream("/revenera.properties"));
+      props.load(ApplicationData.class.getResourceAsStream("/revenera.properties"));
 
       Arrays.stream(Items.values()).forEach(item -> properties.put(item, props.getProperty(item.name)));
     }

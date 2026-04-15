@@ -2,7 +2,8 @@ package com.revenera.gcs.transaction;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.revenera.gcs.utils.Log;
+import com.revenera.gcs.utils.log.Level;
+import com.revenera.gcs.utils.log.Log;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -103,7 +104,7 @@ public class Transaction extends NamedEntity {
   @JsonIgnore
   public Transaction commit() {
     transactions.add(this);
-    logger.array(Log.Level.info, "transaction size", transactions.size());
+    logger.array(Level.info, "transaction size", transactions.size());
     return this;
   }
 

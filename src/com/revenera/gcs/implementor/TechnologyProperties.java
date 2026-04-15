@@ -2,9 +2,9 @@ package com.revenera.gcs.implementor;
 
 public interface TechnologyProperties {
 
-  public abstract String technologyName();
+  String technologyName();
 
-  public abstract String technologyId();
+  String technologyId();
 
-  public abstract void configureTechnologyProperties(String id, String name);
+  void configureTechnologyProperties(String id, String name);
 }

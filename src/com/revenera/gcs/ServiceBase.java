@@ -2,8 +2,8 @@ package com.revenera.gcs;
 
 import com.flexnet.external.type.*;
 import com.revenera.gcs.utils.Diagnostics.Token;
-import com.revenera.gcs.utils.Log;
 import com.revenera.gcs.utils.Utils;
+import com.revenera.gcs.utils.log.Log;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;

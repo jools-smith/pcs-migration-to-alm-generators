@@ -94,7 +94,7 @@
         <!-- this copy works -->
         <echo file="${build}/revenera.properties">
 build.version.major=0
-build.version.minor=D
+build.version.minor=F
 build.number=${build.number}
 build.timestamp=${build.timestamp}
 build.date=${build.date}
@@ -103,7 +103,7 @@ build.category=BETA
 build.username=${user.name}
 app.logging.level=TRACE
 app.logging.root=c:\\revenera
-app.housekeeping=60
+app.housekeeping=15
         </echo>
     </target>
 

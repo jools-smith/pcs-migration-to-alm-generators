@@ -3,11 +3,11 @@ package com.revenera.gcs;
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
 import com.revenera.gcs.implementor.AbstractImplementor;
 import com.revenera.gcs.implementor.ImplementorFactory;
-import com.revenera.gcs.implementor.TechnologyProperties;
 import com.revenera.gcs.utils.AnnotationManager;
 import com.revenera.gcs.utils.Diagnostics;
 import com.revenera.gcs.utils.GeneratorImplementor;
-import com.revenera.gcs.utils.Log;
+import com.revenera.gcs.utils.log.Level;
+import com.revenera.gcs.utils.log.Log;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -31,19 +31,19 @@ public class Application implements ServletContextListener {
   /** instance */
   private static final AtomicReference<Application> singleton = new AtomicReference<>();
 
-  private static final BuildVersion buildVersion = new BuildVersion();
+  private static final ApplicationProiperties applicationProperties = new ApplicationProiperties();
 
   @SuppressWarnings("unused")
-  public static Application singleton() {
-    return singleton.get();
-  }
+//  public static Application singleton() {
+//    return singleton.get();
+//  }
 
   public static Application getInstance() {
     return singleton.get();
   }
 
-  public static BuildVersion getBuildVersion() {
-    return buildVersion;
+  public static ApplicationProiperties getApplicationProperties() {
+    return applicationProperties;
   }
 
   /** implementor factory */
@@ -58,10 +58,10 @@ public class Application implements ServletContextListener {
     try {
 
       Log.setLoggingLevel(
-          Log.Level.valueOf(
-              buildVersion.getLoggingLevel().toLowerCase()));
+          Level.valueOf(
+              applicationProperties.getLoggingLevel().toLowerCase()));
 
-      Log.setLoggingRoot(buildVersion.getLoggingRoot());
+      Log.setLoggingRoot(applicationProperties.getLoggingRoot());
 
       logger.in();
     }
@@ -83,7 +83,7 @@ public class Application implements ServletContextListener {
 
       logger.me(this);
 
-      logger.array(Log.Level.info, "version", buildVersion.getVersionDetails());
+      logger.array(Level.info, "version", applicationProperties.getVersionDetails());
     }
     catch (final Throwable t) {
       logger.exception(t);
@@ -109,7 +109,7 @@ public class Application implements ServletContextListener {
     try {
       final Enumeration<String> itt = event.getServletContext().getAttributeNames();
       while (itt.hasMoreElements()) {
-        logger.log(Log.Level.trace, itt.nextElement());
+        logger.log(Level.trace, itt.nextElement());
       }
     }
     catch (final Throwable t) {
@@ -132,7 +132,7 @@ public class Application implements ServletContextListener {
   private void housekeeping() {
     logger.in();
     try {
-      logger.json(Log.Level.debug, this.diagnostics.serialize());
+      logger.json(Level.debug, this.diagnostics.serialize());
     }
     catch (final Throwable t) {
       logger.exception(t);
@@ -159,10 +159,10 @@ public class Application implements ServletContextListener {
       try {
         // try 3 times
         for (int i = 0; i < 3; i++) {
-          logger.log(Log.Level.trace, "scheduler await termination");
+          logger.log(Level.trace, "scheduler await termination");
 
           if (scheduler.awaitTermination(10, TimeUnit.SECONDS)) {
-            logger.log(Log.Level.trace, "scheduler terminated");
+            logger.log(Level.trace, "scheduler terminated");
             break;
           }
           scheduler.shutdownNow();
@@ -183,11 +183,11 @@ public class Application implements ServletContextListener {
     try {
       logAttributeNames(event);
 
-      startup(0, buildVersion.getHousekeepingFrequency());
+      startup(0, applicationProperties.getHousekeepingFrequency());
 
       this.web_inf = event.getServletContext().getRealPath("/WEB-INF");
 
-      logger.array(Log.Level.info, "resources", getResourcePath());
+      logger.array(Level.info, "resources", getResourcePath());
 
       final AnnotationManager manager = new AnnotationManager();
 
@@ -201,7 +201,7 @@ public class Application implements ServletContextListener {
 
           final GeneratorImplementor ann = type.getAnnotation(GeneratorImplementor.class);
 
-          logger.array(Log.Level.debug, "found annotation",
+          logger.array(Level.debug, "found annotation",
               ann.technologyId(),
               ann.technologyName(),
               ann.isDefault(),
@@ -220,7 +220,7 @@ public class Application implements ServletContextListener {
 
       final LicenseGeneratorServiceInterface implementor = implementorFactory.getDefaultImplementor();
       if (implementor != null) {
-        logger.array(Log.Level.info, "default implementor", implementor.getClass().getName());
+        logger.array(Level.info, "default implementor", implementor.getClass().getName());
       }
       else {
         throw new RuntimeException("No default implementor found");
@@ -230,7 +230,7 @@ public class Application implements ServletContextListener {
       logger.exception(t);
     }
     finally {
-      logger.out();
+      logger.yaml(Level.debug, ApplicationData.create());
     }
   }
 

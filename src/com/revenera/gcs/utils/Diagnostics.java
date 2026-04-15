@@ -12,6 +12,7 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.revenera.gcs.utils.log.Log;
 
 public final class Diagnostics {
 
@@ -110,21 +111,38 @@ public final class Diagnostics {
 
   synchronized public Object serialize() {
     
-    final Map<String, Object> obj = new LinkedHashMap<String,Object>();
-    obj.put("up-at", started.toString());
-    obj.put("up-for",  reformat.apply(elapseNow.apply(this.started)));
-    
-    for (final Entry<Class<?>, Details> entry : this.classes.entrySet()) {
+    return new LinkedHashMap<String,Object>() {
+      {
+        put("time", Instant.now().toString());
+        put("up-at", started.toString());
+        put("up-for",  reformat.apply(elapseNow.apply(Diagnostics.this.started)));
 
-      obj.put(entry.getKey().getSimpleName(), new LinkedHashMap<String,Object>() {
-        {
-          this.put("idle-for",  reformat.apply(elapseNow.apply(entry.getValue().lastAccessed)));
-          this.put("accessCounts", entry.getValue().accessCounts);
+        for (final Entry<Class<?>, Details> entry : Diagnostics.this.classes.entrySet()) {
+
+          put(entry.getKey().getSimpleName(), new LinkedHashMap<String,Object>() {
+            {
+              this.put("idle-for",  reformat.apply(elapseNow.apply(entry.getValue().lastAccessed)));
+              this.put("accessCounts", entry.getValue().accessCounts);
+            }
+          });
         }
-      });
-    }
+      }
+    };
 
-    return obj;
+//    obj.put("up-at", started.toString());
+//    obj.put("up-for",  reformat.apply(elapseNow.apply(this.started)));
+//
+//    for (final Entry<Class<?>, Details> entry : this.classes.entrySet()) {
+//
+//      obj.put(entry.getKey().getSimpleName(), new LinkedHashMap<String,Object>() {
+//        {
+//          this.put("idle-for",  reformat.apply(elapseNow.apply(entry.getValue().lastAccessed)));
+//          this.put("accessCounts", entry.getValue().accessCounts);
+//        }
+//      });
+//    }
+//
+//    return obj;
   }
   
   public Token getToken(final Class<?> clazz, final String endpoint) {

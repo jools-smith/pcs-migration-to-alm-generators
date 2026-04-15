@@ -4,7 +4,7 @@ import com.flexnet.external.type.*;
 import com.flexnet.external.webservice.keygenerator.LicGeneratorException;
 import com.revenera.gcs.Application;
 import com.revenera.gcs.utils.GeneratorImplementor;
-import com.revenera.gcs.utils.Log;
+import com.revenera.gcs.utils.log.Level;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -47,7 +47,7 @@ public class FNPS_LicenseGenerator extends AbstractImplementor {
 
       final Path file = Files.createFile(res.getLicenseFilepath().toAbsolutePath());
 
-      logger.array(Log.Level.debug,"license file path", file.toAbsolutePath());
+      logger.array(Level.debug,"license file path", file.toAbsolutePath());
 
       final ProcessBuilder pb = new ProcessBuilder(
           res.getExecutablePath().toAbsolutePath().toString(),  // executable path
@@ -71,10 +71,10 @@ public class FNPS_LicenseGenerator extends AbstractImplementor {
       pb.directory(res.getWorkingDirectory().toFile());
 
       final Process proc = pb.start();
-      logger.log(Log.Level.debug, "started process");
+      logger.log(Level.debug, "started process");
 
       final boolean status = proc.waitFor(30, TimeUnit.SECONDS);
-      logger.log(Log.Level.debug, "finished process");
+      logger.log(Level.debug, "finished process");
 
       try (final BufferedReader reader =
                new BufferedReader(
