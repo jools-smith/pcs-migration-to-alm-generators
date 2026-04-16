@@ -2,8 +2,7 @@ package com.revenera.gcs.transaction;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.revenera.gcs.utils.log.Level;
-import com.revenera.gcs.utils.log.Log;
+import com.revenera.gcs.utils.log.LoggingFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -14,7 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class Transaction extends NamedEntity {
   private final static LinkedBlockingQueue<Transaction> transactions = new LinkedBlockingQueue<>();
 
-  public static final Log logger = Log.create(Transaction.class);
+  public static final LoggingFactory logger = LoggingFactory.create(Transaction.class);
 
   @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
   public class Element extends TimedEntity {
@@ -104,7 +103,7 @@ public class Transaction extends NamedEntity {
   @JsonIgnore
   public Transaction commit() {
     transactions.add(this);
-    logger.array(Level.info, "transaction size", transactions.size());
+    logger.info().log("transaction size", transactions.size());
     return this;
   }
 

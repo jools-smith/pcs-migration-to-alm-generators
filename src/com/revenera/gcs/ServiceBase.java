@@ -3,7 +3,7 @@ package com.revenera.gcs;
 import com.flexnet.external.type.*;
 import com.revenera.gcs.utils.Diagnostics.Token;
 import com.revenera.gcs.utils.Utils;
-import com.revenera.gcs.utils.log.Log;
+import com.revenera.gcs.utils.log.LoggingFactory;
 
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 public abstract class ServiceBase {
 
-  protected final Log logger = Log.create(this.getClass());
+  protected final LoggingFactory logger = LoggingFactory.create(this.getClass());
 
   protected ServiceBase() {
     this.logger.in();

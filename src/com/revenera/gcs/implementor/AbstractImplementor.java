@@ -6,7 +6,7 @@ import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInter
 import com.revenera.gcs.Application;
 import com.revenera.gcs.ApplicationData;
 import com.revenera.gcs.utils.Utils;
-import com.revenera.gcs.utils.log.Log;
+import com.revenera.gcs.utils.log.LoggingFactory;
 import org.apache.commons.lang3.SystemProperties;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractImplementor implements TechnologyProperties, LicenseGeneratorServiceInterface {
 
-  protected final Log logger = Log.create(this.getClass());
+  protected final LoggingFactory logger = LoggingFactory.create(this.getClass());
 
   @SuppressWarnings("unused")
   static protected <T> T raiseLicGeneratorException(final Throwable t) throws LicGeneratorException {
@@ -114,7 +114,7 @@ public abstract class AbstractImplementor implements TechnologyProperties, Licen
           }
 
           this.str = new Bag()
-              .with("imp", logger.type().getSimpleName(), technologyId())
+              .with("imp", logger.getType().getSimpleName(), technologyId())
               .with("ver",
                   Application.getApplicationProperties().getVersion(),
                   Application.getApplicationProperties().getDate(),

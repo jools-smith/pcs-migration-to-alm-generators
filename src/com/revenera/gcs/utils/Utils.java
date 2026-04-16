@@ -15,20 +15,23 @@ import java.util.function.Function;
 public class Utils {
 
   public static final  ObjectMapper json_mapper_indented = new ObjectMapper()
-          .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
-          .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-          .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-          .enable(SerializationFeature.INDENT_OUTPUT);
+      .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+      .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+      .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+      .enable(SerializationFeature.INDENT_OUTPUT)
+      .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
   public static final  ObjectMapper json_mapper = new ObjectMapper()
-          .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
-          .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-          .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+      .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+      .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+      .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+      .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
   public static final  ObjectMapper yaml_mapper = new ObjectMapper(new YAMLFactory())
-          .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
-          .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-          .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+      .enable(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS)
+      .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+      .enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+      .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 
   static {
     json_mapper_indented.findAndRegisterModules();

@@ -1,20 +1,30 @@
 package com.revenera.gcs.utils.log;
 
-  /**
-   * LEVEL
-   */
-  public enum Level {
+public enum Level {
+  ERROR(0, "ERROR"),
+  WARNING(1, "WARN"),
+  INFO(2, "INFO"),
+  DEBUG(4, "DEBUG"),
+  TRACE(8, "TRACE"),
+  // catchall
+  ALL(Integer.MAX_VALUE, "ALL");
 
-    trace(0),
-    debug(1),
-    info(2),
-    warning(3),
-    error(4),
-    severe(5);
+  private final int value;
+  private final String text;
 
-    public final int value;
-
-    Level(final int value) {
-      this.value = value;
-    }
+  Level(final int value, final String text) {
+    this.value = value;
+    this.text = text;
   }
+
+  public int getValue() {
+    return value;
+  }
+  public String getText() {
+    return text;
+  }
+
+  public int compare(final Level level) {
+    return this.value - level.value;
+  }
+}

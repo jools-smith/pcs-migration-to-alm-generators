@@ -1,14 +1,13 @@
 package com.revenera.gcs.implementor;
 
 import com.flexnet.external.webservice.keygenerator.LicenseGeneratorServiceInterface;
-import com.revenera.gcs.utils.log.Level;
-import com.revenera.gcs.utils.log.Log;
+import com.revenera.gcs.utils.log.LoggingFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ImplementorFactory {
-  private final static Log logger = Log.create(ImplementorFactory.class);
+  private final static LoggingFactory logger = LoggingFactory.create(ImplementorFactory.class);
 
   private final Map<String, LicenseGeneratorServiceInterface> implementors = new HashMap<>();
 
@@ -16,7 +15,7 @@ public class ImplementorFactory {
 
   public void addImplementor(final AbstractImplementor imp, final boolean isDefault) {
 
-    logger.log(Level.debug, imp.technologyId() + " -> " + imp.getClass().getSimpleName());
+    logger.debug().log(imp.technologyId() + " -> " + imp.getClass().getSimpleName());
 
     this.implementors.put(imp.technologyId(), imp);
 

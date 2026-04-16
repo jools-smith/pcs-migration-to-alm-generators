@@ -1,29 +1,41 @@
 package com.revenera.gcs.utils.log;
 
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 public class Context {
-  final StackTraceElement element = new Throwable().getStackTrace()[3];
+  final StackTraceElement element;
+  final Level level;
   final Instant time = Instant.now();
 
+  Context(final Level level, final StackTraceElement element) {
+    this.level = level;
+    this.element = element; 
+  }
+  
+  public Level getLevel() {
+    //
+    return level;
+  }
+
   //UTC
-  String getTimeUtc() {
+  public String getTimeUtc() {
     return time.toString()
         .replace("T", " ")
         .replace("Z", "");
   }
 
-  String getClassName() {
+  public String getClassName() {
+    //
     return this.element.getClassName();
   }
 
-  String getMethod() {
+  public String getMethodName () {
+    //
     return this.element.getMethodName();
   }
 
-  int getLine() {
+  int getLineNumber(){
+    //
     return this.element.getLineNumber();
   }
 }

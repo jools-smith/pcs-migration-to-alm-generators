@@ -12,11 +12,11 @@ import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.revenera.gcs.utils.log.Log;
+import com.revenera.gcs.utils.log.LoggingFactory;
 
 public final class Diagnostics {
 
-  public final static Log logger = Log.create(Diagnostics.class);
+  public final static LoggingFactory logger = LoggingFactory.create(Diagnostics.class);
 
   private static final Function<Duration, String> reformat = (d) -> {
     final AtomicReference<String> str = new AtomicReference<>(d.toString().replace("PT","").replace("H",":").replace("M",":").replace("S",""));
@@ -41,6 +41,13 @@ public final class Diagnostics {
     }
     
     public void commit() {
+      final Duration d = Duration.between(this.timestamp, Instant.now());
+
+      logger.debug().log(
+          this.clazz.getSimpleName(),
+          this.endpoint,
+          d.getSeconds() + d.getNano() / 1_000_000_000.0);
+
       Diagnostics.this.touch(this);
     }
   }
@@ -100,7 +107,6 @@ public final class Diagnostics {
   }
 
   public Diagnostics() {
-
     logger.me(this);
   }
 
